@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI ช่างไฟฟ้ายานยนต์</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f9; margin: 0; padding: 20px; color: #333; }
+        h2 { color: #d9534f; text-align: center; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 8px; }
+        button { padding: 12px 20px; background: #0275d8; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        button:active { background: #025aa5; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 15px; }
+        .card h3 { margin-top: 0; color: #0275d8; }
+        ul { padding-left: 20px; }
+        .error { color: red; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>🚗 AI ช่างไฟฟ้ายานยนต์</h2>
+    
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="พิมพ์รหัส DTC เช่น C1145 หรือ P0105...">
+        <button onclick="searchData()">ค้นหา</button>
+    </div>
+
+    <div id="resultContainer"></div>
+
+    <script>
+        // ฐานข้อมูลตัวอย่างจากคู่มือซ่อมระบบไฟฟ้า
+        const database = {
+            "C1145": {
+                dtc: "C1145",
+                system: "ABS (Antilock Brake System)",
+                component: "เซ็นเซอร์ความเร็วล้อหน้าขวา (RF Wheel-Speed Sensor)[span_0](start_span)[span_0](end_span)",
+                wireColor: "ชุดสายไฟคู่เชื่อมต่อระหว่างเซ็นเซอร์และ ABS HU/CM[span_1](start_span)[span_1](end_span)[span_2](start_span)[span_2](end_span)",
+                fuse: "ฟิวส์หลัก ABS 40A และฟิวส์โซลีนอยด์ ABS/SOL 20A[span_3](start_span)[span_3](end_span)",
+                voltage: "แรงดันพัลส์สัญญาณ / ไฟเลี้ยง B+ (12V - 14V)[span_4](start_span)[span_4](end_span)[span_5](start_span)[span_5](end_span)",
+                resistance: "1.2 - 1.6 kΩ (กิโลโอห์ม)[span_6](start_span)[span_6](end_span)",
+                clearance: "0.3 - 1.1 มม.[span_7](start_span)[span_7](end_span)",
+                steps: [
+                    "ตรวจสอบค่า PID (WSPD RF) ผ่านเครื่องมือสแกนขณะขับขี่[span_8](start_span)[span_8](end_span)",
+                    "วัดค่าความต้านทานที่ขั้วปลั๊กเซ็นเซอร์ (ต้องได้ 1.2 - 1.6 kΩ)[span_9](start_span)[span_9](end_span)",
+                    "ตรวจสอบระยะห่างระหว่างเซ็นเซอร์กับเฟืองโรเตอร์ (0.3 - 1.1 มม.)[span_10](start_span)[span_10](end_span)",
+                    "ตรวจสอบความต่อเนื่องของชุดสายไฟระหว่างปลั๊กและ ABS HU/CM[span_11](start_span)[span_11](end_span)",
+                    "เคลียร์รหัส DTC ผ่านเครื่องมือวิเคราะห์หลังซ่อมเสร็จ[span_12](start_span)[span_12](end_span)[span_13](start_span)[span_13](end_span)"
+                ]
+            },
+            "P0105": {
+                dtc: "P0105",
+                system: "Engine Control System",
+                component: "วงจรบูสท์เซ็นเซอร์ (Boost Sensor Circuit)[span_14](start_span)[span_14](end_span)",
+                wireColor: "ตามรหัสสีมาตรฐานในคู่มือวงจรไฟฟ้า[span_15](start_span)[span_15](end_span)",
+                fuse: "Main Relay / Engine Control Fuse[span_16](start_span)[span_16](end_span)",
+                voltage: "5V (Sensor Power Supply) / แรงดันสัญญาณตามระดับบูสท์[span_17](start_span)[span_17](end_span)",
+                resistance: "อ้างอิงค่ามาตรฐานตามช่วงอุณหภูมิในคู่มือ[span_18](start_span)[span_18](end_span)[span_19](start_span)[span_19](end_span)",
+                clearance: "N/A",
+                steps: [
+                    "ตรวจสอบรหัส DTC และข้อมูล Freeze Frame Data[span_20](start_span)[span_20](end_span)",
+                    "ตรวจสอบจุดเชื่อมต่อ ปลั๊กสายไฟ ว่าหลวมหรือเสียหายหรือไม่[span_21](start_span)[span_21](end_span)",
+                    "วัดแรงดันไฟเลี้ยงเซ็นเซอร์ที่ขั้วต่อต้องได้ประมาณ 5 โวลต์[span_22](start_span)[span_22](end_span)",
+                    "ลบบันทึกรหัส DTC ออกจากหน่วยความจำกล่อง PCM[span_23](start_span)[span_23](end_span)"
+                ]
+            }
+        };
+
+        function searchData() {
+            let query = document.getElementById('searchInput').value.toUpperCase().trim();
+            let container = document.getElementById('resultContainer');
+            
+            if (database[query]) {
+                let data = database[query];
+                let stepsHtml = data.steps.map(step => `<li>${step}</li>`).join('');
+                
+                container.innerHTML = `
+                    <div class="card">
+                        <h3>รหัส DTC: ${data.dtc} (${data.system})</h3>
+                        <p><b>ชิ้นส่วน:</b> ${data.component}</p>
+                        <p><b>🎨 สีสายไฟ:</b> ${data.wireColor}</p>
+                        <p><b>📐 ขนาด / พิกัด:</b> ${data.fuse}</p>
+                        <p><b>⚡ แรงดันไฟ:</b> ${data.voltage}</p>
+                        <p><b>📊 ความต้านทาน:</b> ${data.resistance}</p>
+                        <p><b>📏 ระยะห่าง:</b> ${data.clearance}</p>
+                        <p><b>⚙️ แนวทางการตรวจสอบ:</b></p>
+                        <ul>${stepsHtml}</ul>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<p class="error">ไม่พบข้อมูลรหัส "${query}" ในระบบ</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

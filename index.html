@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/index.css">
+  <script src="jsx/index.js"></script>
+  <title>changpongwjring</title>
+  <style>
+      body {
+          background-image: url('https://colab.research.google.com/drive/1d7RFqHm4Km_asQvr7EiKANsHakjPnAud');
+          background-repeat: no-repeat;
+          background-size: cover;
+          background-position: center center;
+          background-attachment: fixed;
+          margin-top: 50px;
+          text-align: center;
+          font-family: sans-serif;
+      }
+    .content-box {
+    color: white;
+    text-align: center;
+    padding-top: 200px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* ใส่เงาให้ตัวหนังสืออ่านง่ายขึ้น */
+        }
+    body {
+    /* ใส่สีดำโปร่งแสง (rgba) ทับลงบนรูปภาพ */
+    background-image: url('https://picsum.photos/1920/1080?random=1');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+}
+    #preview-img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 15px;
+            display: none; /* ซ่อนไว้ก่อนเมื่อยังไม่ได้เลือกรูป */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+แ
+
+       h1 {
+        color:red;
+       }
+    p {
+      color: red
+    }
+   </style>
+</head>
+
+   <body>
+      <h1>ร้านช่างผ่องวายริ่ง</h1>
+     <h2>เลือกรูปภาพจากโทรศัพท์ของคุณ</h2>
+    
+    <!-- ปุ่มสำหรับเลือกไฟล์รูปภาพ (ถ้าเปิดบนมือถือ จะเด้งเข้าคลังภาพหรือกล้องถ่ายรูป) -->
+    <input type="file" id="imageInput" accept="image/*">
+
+    <!-- แท็กแสดงรูปภาพตัวอย่าง -->
+    <div>
+        <img id="preview-img" src="" alt="รูปภาพที่เลือก">
+    </div>
+
+    <!-- เชื่อมต่อไฟล์ JavaScript -->
+    <script src="script.js"></script>
+
+      <p>วายสายไฟรถยนต์ทุกชนิด สิบล้อ เครื่องจักหนัก</p>
+      <imag
+      <button id="greeting" onclick="changetexe()">ติดต่อสอบถาม</button>
+      
+   <script>
+       function changetexe() {
+      //   1. document.getElementById("greeting") ->
+      //   2. .innerText = "..." ->
+           document.getElementById("greeting").innerText = "โทร0812853142";
+             }
+     // ฟังก์ชันสำหรับเปลี่ยนรูปภาพพื้นหลังของ body
+function changeBackground(imageUrl) {
+    document.body.style.backgroundImage = `url('${imageUrl}')`;
+}
+     // ดึง Element จาก HTML
+const imageInput = document.getElementById('imageInput');
+const previewImg = document.getElementById('preview-img');
+
+// ดักจับ Event เมื่อมีการเลือกไฟล์
+imageInput.addEventListener('change', function(event) {
+    const file = event.target.files[0]; // ดึงไฟล์รูปภาพแรกที่เลือก
+    
+    if (file) {
+        // สร้าง URL ชั่วคราวจากไฟล์ในเครื่องเพื่อนำมาแสดงบนหน้าเว็บ
+        const imageUrl = URL.createObjectURL(file);
+        
+        // ใส่ URL ให้กับแท็ก <img> และสั่งให้แสดงผล
+        previewImg.src = imageUrl;
+        previewImg.style.display = 'block';
+    }
+});
+
+
+// ตัวอย่างการใช้งาน: เปลี่ยนรูปภาพเมื่อโหลดหน้าเว็บ หรือตั้งเวลาเปลี่ยน
+// document.body.style.backgroundImage = "url('new-image.jpg')";
+
+   </script>
+   </body>
+
+</html>
